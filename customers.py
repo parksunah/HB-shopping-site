@@ -39,8 +39,11 @@ def read_customer(filepath):
 
 def get_by_email(email):
 
-    return customer[email]
-
+    if email in customer:
+        return customer[email]
+    
+    else:
+        return Customer('a','b','c','d')
 
 
 
