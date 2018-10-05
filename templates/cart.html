@@ -3,6 +3,8 @@
 
 {% block body %}
 
+{% if 'cart' in session %}
+
     <table class="table table-striped">
         <thead>
         <tr>
@@ -25,6 +27,10 @@
     </table>
 
     <h3>Total: ${{ "%.2f"|format(order_cost) }}</h3>
+
+{% else %}
+ <h3> Your cart is empty.</h3>
+ {% endif %}
 
     <a href="/checkout" class="btn btn-large btn-primary">Check Out</a>
 

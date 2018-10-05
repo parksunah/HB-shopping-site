@@ -66,13 +66,17 @@ def show_shopping_cart():
     # The logic here will be something like:
     
     # - get the cart dictionary from the session 
-    shopping_cart = session.get('cart')
     # shopping_cart = {melon_id: quantity}
-    order_melons = []
-    order_cost = 0
+    shopping_cart = session.get('cart')
     # - create a list to hold melon objects and a variable to hold the total
     #   cost of the order
     # - loop over the cart dictionary, and for each melon id:
+    order_melons = []
+    order_cost = 0
+
+    if 'cart' not in session:
+        return render_template("cart.html")
+
     for melon_id, qty in shopping_cart.items():
         #    - get the corresponding Melon object
         melon = melons.get_by_id(melon_id)
@@ -81,7 +85,6 @@ def show_shopping_cart():
         
     #    - add this to the order total
         order_cost += total
-
   
     #    - add quantity and total cost as attributes on the Melon object
         melon.qty = qty
@@ -93,7 +96,8 @@ def show_shopping_cart():
     # Make sure your function can also handle the case wherein no cart has
     # been added to the session
 
-    return render_template("cart.html", order_cost=order_cost, melon=melon, order_melons=order_melons)
+    return render_template("cart.html", order_cost=order_cost,
+                                        melon=melon, order_melons=order_melons)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -154,10 +158,10 @@ def process_login():
         customer = customers.get_by_email(email)
         if password == customer.password:
             session['logged_in_customer_email'] = email
-            flash("successful login.")
+            flash("Successful login.")
             return redirect("/melons")
         else: 
-            flash("Check your password.")
+            flash("Password is not correct.")
             return redirect("/login")  
 
     # - use customers.get_by_email() to retrieve corresponding Customer
@@ -168,6 +172,17 @@ def process_login():
     #   message and redirect the user to the "/melons" route
     # - if they don't, flash a failure message and redirect back to "/login"
     # - do the same if a Customer with that email doesn't exist
+
+
+@app.route('/logout')
+def process_logout():
+    """ Log a user out """
+
+    session.pop('logged_in_customer_email')
+    flash('You have signed out.')
+    return redirect('/melons')
+
+
 
 @app.route("/checkout")
 def checkout():
@@ -181,4 +196,4 @@ def checkout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0') # in virtual env, the host is '0.0.0.0'
