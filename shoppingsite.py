@@ -146,23 +146,19 @@ def process_login():
     # - get user-provided name and password from request.form
     email = request.form.get("email")
     password = request.form.get("password")
-    customer = customers.get_by_email(email)
-
-    if "email" not in session:
-        session['email'] = {}
-
-    if email in customer.email:
+   
+    if not customers.get_by_email(email):
+        flash("Email not found.")
+        return redirect("/login") 
+    else:
+        customer = customers.get_by_email(email)
         if password == customer.password:
-            session['email']['password'] = session['email'].get('password')
+            session['email'] = email
             flash("successful login.")
             return redirect("/melons")
         else: 
             flash("Check your password.")
-            return redirect("/login")
-
-    else:
-        flash("Email not found.")
-        return redirect("/login")   
+            return redirect("/login")  
 
     # - use customers.get_by_email() to retrieve corresponding Customer
     #   object (if any)
